@@ -9,8 +9,8 @@ document.getElementById("feedbackForm").addEventListener("submit", function(e) {
     const rating = document.getElementById("rating").value;
     const message = document.getElementById("message").value;
 
-    // Fixed: Pointing to your LIVE Render URL instead of localhost
-    fetch("https://feedback-form-project-1-1p2c.onrender.com/api/feedback", {
+    // Use the URL from your latest Render dashboard screenshot
+    fetch("https://feedback-form-project-bmid.onrender.com/api/feedback", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -33,7 +33,7 @@ document.getElementById("feedbackForm").addEventListener("submit", function(e) {
         alert("Feedback saved successfully ✅");
         document.getElementById("feedbackForm").reset();
     })
-    .catch(err => {     
+    .catch(err => {
         console.error(err);
         alert("Error sending data ❌");
     });
