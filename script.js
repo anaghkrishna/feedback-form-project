@@ -37,4 +37,4 @@ document.getElementById("feedbackForm").addEventListener("submit", function(e) {
         console.error(err);
         alert("Error sending data ❌");
     });
-});
+}); 
