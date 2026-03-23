@@ -1,7 +1,8 @@
-require('dotenv').config(); // Load environment variables at the very top
+require('dotenv').config();
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const path = require("path"); // Added this to help find your files
 
 const app = express();
 
@@ -9,7 +10,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ⚡ TiDB Connection Pool (Using Environment Variables)
+// --- NEW PART: This tells the server to serve your HTML, CSS, and JS files ---
+app.use(express.static(path.join(__dirname)));
+
+// This tells the server: "When someone visits my link, show them index.html"
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+// ---------------------------------------------------------------------------
+
+// TiDB Connection Pool
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -34,7 +44,7 @@ db.getConnection((err, conn) => {
     }
 });
 
-// POST API
+// POST API for Feedback
 app.post("/api/feedback", (req, res) => {
     const { name, email, course, department, faculty, rating, message } = req.body;
 
@@ -56,5 +66,5 @@ app.post("/api/feedback", (req, res) => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT} 🚀`);
+    console.log(`Server running on port ${PORT} 🚀`);
 });
