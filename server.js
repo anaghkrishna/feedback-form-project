@@ -1,3 +1,4 @@
+require('dotenv').config(); // Load environment variables at the very top
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
@@ -8,13 +9,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔥 TiDB Connection Pool (STABLE)
+// ⚡ TiDB Connection Pool (Using Environment Variables)
 const db = mysql.createPool({
-    host: "gateway01.us-east-1.prod.aws.tidbcloud.com",
-    user: "3U8YTCtxzbrGx49.root",
-    password: "4NDesH9UTeLrs3vr",
-    database: "feedback_db", // ⚠️ make sure your table is here
-    port: 4000,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 4000,
     ssl: {
         rejectUnauthorized: true
     },
@@ -26,7 +27,7 @@ const db = mysql.createPool({
 // Test connection
 db.getConnection((err, conn) => {
     if (err) {
-        console.log("DB Connection Error ❌", err);
+        console.error("DB Connection Error ❌", err);
     } else {
         console.log("Connected to TiDB Cloud ✅");
         conn.release();
@@ -40,20 +41,20 @@ app.post("/api/feedback", (req, res) => {
     const sql = `
         INSERT INTO feedback 
         (name, email, course, department, faculty, rating, message) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql, [name, email, course, department, faculty, rating, message], (err, result) => {
         if (err) {
-            console.log("DB ERROR:", err);
-            return res.status(500).send("Error saving data ❌");
+            console.error("DB ERROR:", err);
+            return res.status(500).json({ error: "Error saving data ❌" });
         }
-
-        res.send("Saved successfully ✅");
+        res.status(200).send("Saved successfully ✅");
     });
 });
 
 // Start server
-app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000 🚀");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT} 🚀`);
 });
