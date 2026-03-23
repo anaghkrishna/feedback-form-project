@@ -1,40 +1,33 @@
 document.getElementById("feedbackForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const course = document.getElementById("course").value;
-    const department = document.getElementById("department").value;
-    const faculty = document.getElementById("faculty").value;
-    const rating = document.getElementById("rating").value;
-    const message = document.getElementById("message").value;
+    const formData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        course: document.getElementById("course").value,
+        department: document.getElementById("department").value,
+        faculty: document.getElementById("faculty").value,
+        rating: document.getElementById("rating").value,
+        message: document.getElementById("message").value
+    };
 
-    // Use the URL from your latest Render dashboard screenshot
+    // Updated to your current live service URL
     fetch("https://feedback-form-project-bmid.onrender.com/api/feedback", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            name,
-            email,
-            course,
-            department,
-            faculty,
-            rating,
-            message
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
     })
-    .then(res => {
-        if (!res.ok) throw new Error("Server error");
-        return res.text();
+    .then(async res => {
+        const text = await res.text();
+        if (!res.ok) throw new Error(text);
+        return text;
     })
     .then(data => {
         alert("Feedback saved successfully ✅");
         document.getElementById("feedbackForm").reset();
     })
     .catch(err => {
-        console.error(err);
-        alert("Error sending data ❌");
+        console.error("Submission Error:", err);
+        alert("Error: " + err.message); // This will now show the actual error on your screen
     });
-}); 
+});
